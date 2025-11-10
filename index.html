@@ -63,43 +63,32 @@
             height: 100%;
             object-fit: cover;
         }
-        .gallery-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-        }
         .arrow {
-            background-color: #3498db;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(52, 152, 219, 0.8);
             color: white;
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
             transition: background-color 0.3s;
-            margin: 0 15px;
+            z-index: 10;
         }
         .arrow:hover {
-            background-color: #2980b9;
+            background-color: rgba(41, 128, 185, 0.9);
         }
-        .pager {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            color: #2c3e50;
+        .prev {
+            left: 15px;
         }
-        .current-page {
-            font-weight: bold;
-            margin: 0 10px;
-        }
-        .total-pages {
-            margin: 0 10px;
+        .next {
+            right: 15px;
         }
         .indicators {
             display: flex;
@@ -113,10 +102,11 @@
             background-color: #bdc3c7;
             margin: 0 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.3s;
         }
         .indicator.active {
             background-color: #3498db;
+            transform: scale(1.2);
         }
         /* Адаптивность для мобильных устройств */
         @media (max-width: 768px) {
@@ -128,6 +118,11 @@
             }
             .image-container {
                 height: 250px;
+            }
+            .arrow {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
             }
         }
         /* Адаптивность для планшетов */
@@ -148,17 +143,10 @@
         <div class="gallery-wrapper">
             <div class="gallery" id="gallery">
                 <!-- Слайды будут добавлены через JavaScript -->
-            </div>
-        </div>
-        
-        <div class="gallery-controls">
-            <button class="arrow" id="prev-btn">&#10094;</button>
-            <div class="pager">
-                <span class="current-page" id="current-page">1</span>
-                <span>/</span>
-                <span class="total-pages" id="total-pages">8</span>
-            </div>
-            <button class="arrow" id="next-btn">&#10095;</button>
+                </div>
+            
+            <button class="arrow prev" id="prev-btn">&#10094;</button>
+            <button class="arrow next" id="next-btn">&#10095;</button>
         </div>
         
         <div class="indicators" id="indicators">
@@ -206,8 +194,6 @@
         const gallery = document.getElementById('gallery');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
-        const currentPageEl = document.getElementById('current-page');
-        const totalPagesEl = document.getElementById('total-pages');
         const indicatorsContainer = document.getElementById('indicators');
 
         // Переменные состояния
@@ -263,7 +249,7 @@
             
             images.forEach((_, index) => {
                 const indicator = document.createElement('div');
-                indicator.className = 'indicator';
+indicator.className = 'indicator';
                 if (index === currentSlide) {
                     indicator.classList.add('active');
                 }
@@ -284,12 +270,8 @@
 
         // Функция для обновления галереи
         function updateGallery() {
-            // Обновляем пейджер
-            currentPageEl.textContent = currentSlide + 1;
-            totalPagesEl.textContent = images.length;
-            
             // Рассчитываем смещение для трансформации
-            // Теперь прокручиваем по одному изображению
+            // Прокручиваем по одному изображению
             const translateX = -currentSlide * (100 / slidesPerView);
             gallery.style.transform = `translateX(${translateX}%)`;
             
