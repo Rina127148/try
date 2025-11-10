@@ -101,6 +101,23 @@
         .total-pages {
             margin: 0 10px;
         }
+        .indicators {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #bdc3c7;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .indicator.active {
+            background-color: #3498db;
+        }
         /* Адаптивность для мобильных устройств */
         @media (max-width: 768px) {
             .slide {
@@ -139,9 +156,13 @@
             <div class="pager">
                 <span class="current-page" id="current-page">1</span>
                 <span>/</span>
-                <span class="total-pages" id="total-pages">3</span>
+                <span class="total-pages" id="total-pages">8</span>
             </div>
-<button class="arrow" id="next-btn">&#10095;</button>
+            <button class="arrow" id="next-btn">&#10095;</button>
+        </div>
+        
+        <div class="indicators" id="indicators">
+            <!-- Индикаторы будут добавлены через JavaScript -->
         </div>
     </div>
     <script>
@@ -187,6 +208,7 @@
         const nextBtn = document.getElementById('next-btn');
         const currentPageEl = document.getElementById('current-page');
         const totalPagesEl = document.getElementById('total-pages');
+        const indicatorsContainer = document.getElementById('indicators');
 
         // Переменные состояния
         let currentSlide = 0;
@@ -228,30 +250,68 @@
                 gallery.appendChild(slide);
             });
             
+            // Создаем индикаторы
+            createIndicators();
+            
             // Обновляем количество слайдов на экране
             updateSlidesPerView();
         }
 
+        // Функция для создания индикаторов
+        function createIndicators() {
+            indicatorsContainer.innerHTML = '';
+            
+            images.forEach((_, index) => {
+                const indicator = document.createElement('div');
+                indicator.className = 'indicator';
+                if (index === currentSlide) {
+                    indicator.classList.add('active');
+                }
+                
+                indicator.addEventListener('click', () => {
+                    goToSlide(index);
+                });
+                
+                indicatorsContainer.appendChild(indicator);
+            });
+        }
+
+        // Функция для перехода к конкретному слайду
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            updateGallery();
+        }
+
         // Функция для обновления галереи
         function updateGallery() {
-            // Рассчитываем общее количество страниц
-            const totalPages = Math.ceil(images.length / slidesPerView);
-            
             // Обновляем пейджер
             currentPageEl.textContent = currentSlide + 1;
-            totalPagesEl.textContent = totalPages;
+            totalPagesEl.textContent = images.length;
             
             // Рассчитываем смещение для трансформации
-            // Умножаем на 100%, чтобы получить правильное смещение
-const translateX = -currentSlide * 100;
+            // Теперь прокручиваем по одному изображению
+            const translateX = -currentSlide * (100 / slidesPerView);
             gallery.style.transform = `translateX(${translateX}%)`;
+            
+            // Обновляем индикаторы
+            updateIndicators();
+        }
+
+        // Функция для обновления индикаторов
+        function updateIndicators() {
+            const indicators = document.querySelectorAll('.indicator');
+            indicators.forEach((indicator, index) => {
+                if (index === currentSlide) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
         }
 
         // Функция для перехода к следующему слайду
         function nextSlide() {
-            const totalPages = Math.ceil(images.length / slidesPerView);
-            
-            if (currentSlide < totalPages - 1) {
+            if (currentSlide < images.length - 1) {
                 currentSlide++;
             } else {
                 currentSlide = 0; // Возврат к первому слайду
@@ -262,12 +322,10 @@ const translateX = -currentSlide * 100;
 
         // Функция для перехода к предыдущему слайду
         function prevSlide() {
-            const totalPages = Math.ceil(images.length / slidesPerView);
-            
             if (currentSlide > 0) {
                 currentSlide--;
             } else {
-                currentSlide = totalPages - 1; // Переход к последнему слайду
+                currentSlide = images.length - 1; // Переход к последнему слайду
             }
             
             updateGallery();
